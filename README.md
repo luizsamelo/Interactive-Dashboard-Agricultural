@@ -9,7 +9,10 @@ Developed as part of the Information Visualization course (VU 2026) at TU Wien.
 ![Flask](https://img.shields.io/badge/Flask-3.x-lightgrey)
  
 ---
- 
+
+<img width="1280" height="604" alt="EX2Video-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/92543cb0-f2aa-4db9-bb71-7bbde5b746cf" />
+
+--- 
 ## Overview
  
 The application provides three fully coordinated views for interactive data exploration:

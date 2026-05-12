@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exercise 2</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    #controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+      color: #444;
+    }
+    #controls select {
+      font-size: 0.85rem;
+      padding: 3px 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      max-width: 340px;
+    }
+    #controls input[type=range] {
+      width: 200px;
+      accent-color: #555;
+    }
+
+    #views {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      grid-template-rows: auto auto;
+      gap: 16px;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 16px;
+    }
+
+    #map-panel {
+      grid-column: 1;
+      grid-row: 1;
+      min-height: 720px;
+      position: relative;
+    }
+
+    #scatter-panel {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    #timeseries-panel {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      min-height: 260px;
+    }
+
+    #scatter-panel h2 {
+      font-size: 0.95rem;
+      color: #444;
+      margin-bottom: 8px;
+    }
+    #scatter-panel .subtitle {
+      font-size: 0.75rem;
+      color: #888;
+      margin-bottom: 12px;
+    }
+    .dot {
+      fill: #003f5c;
+      stroke: #fff;
+      stroke-width: 1;
+      cursor: pointer;
+      transition: fill 0.15s;
+    }
+    .dot:hover         { fill: #ffa600; }
+    .dot.selected      { fill: #ef527a; }
+    .dot.brush-selected{ fill: #ffa600; stroke: #c07000; }
+    .dot.map-highlight { fill: #e03030; stroke: #800; }
+    #scatter-svg { width: 100%; height: auto; display: block; }
+    .axis text { font-size: 10px; fill: #666; }
+    .axis line, .axis path { stroke: #ccc; }
+    .axis-label { font-size: 11px; fill: #555; }
+    .zero-line { stroke: #ccc; stroke-dasharray: 4 3; }
+    .brush .selection {
+      fill: rgba(100,150,200,0.25);
+      stroke: #669;
+      stroke-width: 1px;
+    }
+
+    #map-svg { width: 100%; height: 720px; display: block; }
+    .country-path { stroke: #fff; stroke-width: 0.4px; }
+    .country-path.not-in-list { fill: #ccc; pointer-events: none; }
+    .country-path.in-list     { fill: #888; cursor: pointer; }
+    .country-path.highlighted { fill: #e03030 !important; stroke: #800 !important; stroke-width: 2.5px; }
+    .country-path.brush-selected   { fill: #ffa600 !important; stroke: #c07000 !important; stroke-width: 2.5px; }
+
+    #map-tooltip {
+      position: absolute;
+      background: rgba(255,252,235,0.97);
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 11px;
+      line-height: 1.7;
+      pointer-events: none;
+      max-width: 260px;
+      box-shadow: 1px 2px 6px rgba(0,0,0,0.15);
+      display: none;
+      z-index: 10;
+    }
+    #map-tooltip .tip-country {
+      font-weight: 700;
+      font-size: 12px;
+      margin-bottom: 3px;
+      text-decoration: underline;
+    }
+
+    #timeseries-panel h2 {
+      font-size: 0.95rem;
+      color: #444;
+      margin-bottom: 8px;
+    }
+    #ts-svg { width: 100%; height: auto; display: block; }
+    .ts-line { fill: none; stroke-width: 2px; }
+    .year-mark { stroke: #aaa; stroke-width: 1px; stroke-dasharray: 4 3; }
+
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 4px;
+      display: none;
+      z-index: 20;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Exercise 2</h1>
+
+<div id="controls">
+  <label>Indicator:
+    <select id="indicator-select">
+      {% for ind in indicators %}
+      <option value="{{ ind }}">{{ ind }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Year: <strong id="year-display">{{ max_year }}</strong>
+    <input type="range" id="year-slider"
+           min="{{ min_year }}" max="{{ max_year }}"
+           value="{{ max_year }}" step="1"/>
+  </label>
+</div>
+
+<div id="views">
+
+  <div class="panel" id="map-panel">
+    <svg id="map-svg"></svg>
+    <div id="map-tooltip"></div>
+  </div>
+
+  <div class="panel" id="scatter-panel">
+    <h2>PCA Scatterplot</h2>
+    <p class="subtitle" id="scatter-subtitle"></p>
+    <svg id="scatter-svg"></svg>
+  </div>
+
+  <div class="panel" id="timeseries-panel">
+    <h2 id="ts-title">Time series — click a country on the map</h2>
+    <svg id="ts-svg"></svg>
+  </div>
+
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+  const pcaData = {{ pca_data | tojson }};
+  const APP = {
+    pcaData:    pcaData,
+    indicators: {{ indicators | tojson }},
+    maxYear:    {{ max_year }},
+    minYear:    {{ min_year }},
+    countries:  {{ countries | tojson }},
+    isoMap:     {{ iso_map | tojson }}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/scatterplot.js') }}"></script>
+<script src="{{ url_for('static', filename='js/timeseries.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>

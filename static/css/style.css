@@ -1,0 +1,217 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 13px;
+  background: #fff;
+  color: #222;
+  padding: 12px 16px 32px;
+}
+
+header {
+  margin-bottom: 10px;
+}
+header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+}
+header .subtitle {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+}
+
+#top-panel {
+  display: flex;
+  gap: 0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #fff;
+  margin-bottom: 10px;
+}
+
+#map-container {
+  flex: 0 0 58%;
+  position: relative;
+  border-right: 1px solid #ddd;
+}
+
+#scatter-container {
+  flex: 1;
+  position: relative;
+  padding: 4px;
+}
+
+#map-svg {
+  width: 100%;
+  height: 380px;
+  display: block;
+}
+
+#scatter-svg {
+  width: 100%;
+  height: 380px;
+  display: block;
+}
+
+#controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+#controls label {
+  white-space: nowrap;
+  color: #333;
+}
+
+#indicator-select {
+  font-size: 12px;
+  padding: 2px 6px;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  max-width: 360px;
+  cursor: pointer;
+}
+
+#year-slider {
+  width: 220px;
+  cursor: pointer;
+  accent-color: #555;
+}
+
+#timeseries-container {
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 4px;
+  background: #fff;
+}
+
+#timeseries-svg {
+  width: 100%;
+  height: 300px;
+  display: block;
+}
+
+.country {
+  stroke: #fff;
+  stroke-width: 0.4px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.country.not-in-list {
+  fill: #aaa;
+  pointer-events: none;
+}
+
+.country.in-list {
+  fill: #555;
+}
+
+.country.highlighted {
+  fill: #e03030 !important;
+  stroke: #800 !important;
+  stroke-width: 1.2px;
+}
+
+.country.brush-selected {
+  fill: #f5a623 !important;
+  stroke: #c07000 !important;
+  stroke-width: 1px;
+}
+
+.dot {
+  fill: #444;
+  stroke: #fff;
+  stroke-width: 0.5px;
+  cursor: pointer;
+  transition: fill 0.12s, r 0.12s;
+}
+
+.dot.highlighted {
+  fill: #e03030 !important;
+  stroke: #800 !important;
+  stroke-width: 1px;
+  r: 8px;
+}
+
+.dot.brush-selected {
+  fill: #f5a623 !important;
+  stroke: #c07000 !important;
+  stroke-width: 1px;
+}
+
+.dot-label {
+  font-size: 9px;
+  fill: #333;
+  pointer-events: none;
+}
+
+/* Brush rectangle */
+.brush .selection {
+  fill: rgba(200, 200, 200, 0.35);
+  stroke: #888;
+  stroke-width: 1px;
+}
+
+/* Axes */
+.axis text {
+  font-size: 10px;
+  fill: #555;
+}
+.axis line, .axis path {
+  stroke: #bbb;
+}
+
+/* Chart title */
+.chart-title {
+  font-size: 11px;
+  fill: #333;
+  font-weight: 600;
+}
+
+/* Legend */
+.legend-item text {
+  font-size: 10px;
+  fill: #333;
+}
+
+.tooltip {
+  position: absolute;
+  background: rgba(255, 252, 240, 0.97);
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.6;
+  pointer-events: none;
+  max-width: 280px;
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.12);
+  z-index: 100;
+}
+
+.tooltip.hidden {
+  display: none;
+}
+
+.tooltip-country {
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 4px;
+  text-decoration: underline;
+}
+
+.ts-line {
+  fill: none;
+  stroke-width: 1.8px;
+}
+
+.ts-legend rect {
+  width: 10px;
+  height: 10px;
+}

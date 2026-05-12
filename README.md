@@ -68,10 +68,6 @@ All views are linked through shared interaction state: hovering, clicking, brush
 ## Setup
  
 ```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-cd YOUR_REPO
- 
 # Install dependencies
 pip install flask pandas scikit-learn
  
@@ -87,9 +83,4 @@ World Bank — Agricultural & Rural Development indicators, covering 49 countrie
  
 The raw data was cleaned and imputed in Exercise 1 using temporal interpolation and iterative imputation (Random Forest).
  
-## Authors
- 
-- Luiz Samelo
-- Maximilian Staudacher
-- Rayudu Muralikrishna
 Group 17 — Information Visualization VU, TU Wien, 2026
